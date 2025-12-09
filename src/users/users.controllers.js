@@ -6,7 +6,7 @@ import { bankAccount } from "../models/bankaccount.js";
 import { User } from "../models/user.js";
 import { aToken, rToken } from "../tokens/jwt.js";
 import { userReg } from "../validators/users.js";
-import { edituserProfile,  findUserByEmail, signUpUser } from "./users.services.js";
+import { edituserProfile,  findAccount,  findUserByEmail, signUpUser } from "./users.services.js";
 
 
 
@@ -33,22 +33,30 @@ export const registerUserController= async (req, res)=>{
          if(error) {return res.status(404).json({error:error.message})}
         
         //  destructure the data from frontend
-        let{ firstName, lastName, email, password, accountType, role}=value
+        let{ firstName, lastName, email, password, accountType, role, pin}=value
 let exist=true
         // check if email exists
         //   const emailExist=users.find((user)=>user.email === email)
         //   if(emailExist){return res.status(404).json({error:`email already exists`})}
         let user= await findUserByEmail({email:value.email});
-        exist=!user
+        
+        exist = !user
+        
         console.log(exist);
         // return error if user is found
         if (user) return res.status(404).json({error:`User already exists`});
         
         // encrypt password
         value.password = await hashPassword(password)
+let findPin = await findAccount({pin})
+
+if(findPin)return res.status(404).json({error:`Pin already exists`})
+         const pinn =  await hashPassword(pin)
+
         user = await signUpUser(value)
 let accountNumber= await generatUniqueNumber(10, bankAccount);
-const BankAccount= await createAccount({userID: user.id, accountNumber, acountType: accountType})
+
+const BankAccount= await createAccount({userID: user.id, accountNumber, acountType: accountType, pin:pinn})
         // let accountNumber= await generateAccountNo()
         // let Account= await findAccount(accountNumber)
 
@@ -66,16 +74,27 @@ const BankAccount= await createAccount({userID: user.id, accountNumber, acountTy
 export const loginUserController= async (req, res )=>{
     try {
         // grab data from frontend
+       
         const{email, password} =  req.body
-         if(!email ) return res.status(202).json({error:'pls fill in details correctly'})
-         // check if user exists
-        //   const Usersemail=users.find((user)=>user.email===email)
-        //   if(!Usersemail){return res.status(404).json({error:'Wrong email'})}
-        let user = await findUserByEmail({email:email});
+         
+        if(!email ) return res.status(202).json({error:'pls fill in details correctly'})
+         
+            // check if user exists
+        
+            //   const Usersemail=users.find((user)=>user.email===email)
+        
+            //   if(!Usersemail){return res.status(404).json({error:'Wrong email'})}
+      
+         let user = await findUserByEmail({email:email});
+
         if(!user) return res.status(404).json({error:`Email does not exits`})
-        // check users password
+        
+            // check users password
+        
         const passmatch= await comparePassword(password, user.password)
+        
         if(!passmatch) return res.status(400).json({error:'Invalid Credentials'})
+        
         const id= user.id
         // const role=user.role
 

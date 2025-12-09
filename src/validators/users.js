@@ -6,5 +6,6 @@ export const userReg = joi.object({
     email: joi.string().email().required(),
     password: joi.string().required().min(8).max(10),
     accountType: joi.string().required(),
-    role: joi.string().required()
+    role: joi.string().required(),
+    pin:joi.string().min(4).max(4)
 }); 

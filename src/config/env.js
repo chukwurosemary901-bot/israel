@@ -6,7 +6,9 @@ export const config=
     port: process.env.PORT,
     access: process.env.ACCESS_SECRET,
     refresh:process.env.REFRESH_SECRET,
-
+    apiKey:process.env.apiKey,
+    databaseURI: process.env.DATABASE_URL,
+    nodeEnv: process.env.NODE_ENV,
     DB:{
       name:process.env.NAME,   
       user:process.env.USER,

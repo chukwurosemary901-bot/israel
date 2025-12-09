@@ -37,6 +37,11 @@ bankAccount.init(
     type:DataTypes.STRING,
     defaultValue:"USD"
     },
+    pin:{
+      type:DataTypes.STRING,
+    allowNull:false, 
+    defaultValue:"pin"
+    }
   },
   {
     sequelize,

@@ -1,8 +1,12 @@
 import { User } from "../models/user.js";
 import {bankAccount} from "../models/bankaccount.js"
+import { where } from "sequelize";
 
 export const findUserByEmail= async (email)=>{
     return await User.findOne({where: email });
+};
+export const findUserByAccount= async (email)=>{
+    return await bankAccount.findOne({where: email });
 };
 export const findUserRole= async (role)=>{
     return await User.findAll({where: role });
@@ -22,8 +26,11 @@ export const generatebankAccount= async (data)=>{
 }
 
 export const findAccount= async (acctNo)=>{
-    return await bankAccount.findOne({where: acctNo });
+     return await bankAccount.findOne({where: acctNo });
 };
+export const findAl= async(id)=>{
+    return await bankAccount.findAll( {where:id})
+}
 
 export const generateAccountNo=async ()=>{
     return Math.floor(Math.random() * 10000000000);
