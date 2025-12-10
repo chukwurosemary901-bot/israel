@@ -1,6 +1,6 @@
 // import { users } from "./users.services.js";
-import { generatUniqueNumber } from "../../utils/accountNumber.js";
-import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
+import { generatUniqueNumber } from "../utils/accountNumber.js";
+import { comparePassword, hashPassword } from "../utils/bcrypt.js";
 import { createAccount } from "../accounts/account.services.js";
 import { bankAccount } from "../models/bankaccount.js";
 import { User } from "../models/user.js";
@@ -38,6 +38,7 @@ let exist=true
         // check if email exists
         //   const emailExist=users.find((user)=>user.email === email)
         //   if(emailExist){return res.status(404).json({error:`email already exists`})}
+        
         let user= await findUserByEmail({email:value.email});
         
         exist = !user
@@ -48,9 +49,7 @@ let exist=true
         
         // encrypt password
         value.password = await hashPassword(password)
-let findPin = await findAccount({pin})
 
-if(findPin)return res.status(404).json({error:`Pin already exists`})
          const pinn =  await hashPassword(pin)
 
         user = await signUpUser(value)

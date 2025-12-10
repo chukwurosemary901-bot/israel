@@ -2,9 +2,13 @@ import { createTransact, depositUpdate, findAlert } from "../transfer/transfer.s
 import { findAccount } from "../transfer/transfer.services.js"
 import { transferSchema } from "../validators/transfer.js"
 import { sequelize } from "../config/sequelize.js"
-import { comparePassword } from "../../utils/bcrypt.js"
+import { comparePassword } from '../utils/bcrypt.js'
 import { findAccountNumber } from "../deposit/deposit.services.js"
-import { convertCurrency } from "../../utils/currency.converter.js"
+import { convertCurrency } from "../utils/currency.converter.js"
+import { text } from "express"
+
+
+
 export const transferControllers = async (req, res) => {
    
     const t = await sequelize.transaction()
@@ -14,6 +18,7 @@ export const transferControllers = async (req, res) => {
             const loggedIn = req.user
             
             if (!loggedIn){
+
                 await t.rollback();
 
                 return res.status(404).json({error:`Kindly login to access this endpoint`})}
@@ -25,9 +30,9 @@ export const transferControllers = async (req, res) => {
               await t.rollback()
 
                 return res.status(401).json({error:error.message})
-  
             } 
-            const {sourceAccountNo, destinationAccountNo, amount , destinationAccount, sourceAccount, category, status, pin} = value
+
+            let {sourceAccountNo, destinationAccountNo, amount , destinationAccount, sourceAccount, category, status, pin} = value
            
             
             let receiver = await findAccount(
@@ -45,6 +50,7 @@ export const transferControllers = async (req, res) => {
             } 
                 
             let sender= await findAccount(
+
                 {accountNumber:sourceAccountNo},
 
                 {transaction: t}
@@ -64,7 +70,8 @@ export const transferControllers = async (req, res) => {
 
             return res.status(401).json({error:`No be you get this  account`})
         }
-            const isMatch = await comparePassword(pin, sender.pin)
+            
+        const isMatch = await comparePassword(pin, sender.pin)
                   
             if(!isMatch)return res.status(404).json({error:`pin is incorrect`})
 
@@ -83,13 +90,16 @@ export const transferControllers = async (req, res) => {
                 return res.status(404).json({error:`Insufficient fund, Your balance is ${sender.balance}`})
             }
 
-           let senderbalance = parseFloat(sender.balance) - parseFloat(amount)
+        let senderbalance = parseFloat(sender.balance) - parseFloat(amount)
+        
+        console.log({balnace:senderbalance});
 
             if(sender.currency !== receiver.currency){
                
-                amount= await convertCurrency(sender.currency, receiver.currency, amount)
-
+                let amount = await convertCurrency(sender.currency, receiver.currency, amount)
+                // amount = text.result
             if(!amount)return res.status(404).json({error:`Error converting currency`})
+            
             }
 
            let receiverbalance = parseFloat(receiver.balance) + parseFloat(amount)
@@ -102,7 +112,7 @@ export const transferControllers = async (req, res) => {
            value.status = "success"
 
            value.category = "transfer"
-        // {// ANOTHER SWEET METHOD
+        //  {// ANOTHER SWEET METHOD
         //    value.balance = senderbalance
         //    await depositUpdate(value, {accountNumber:sender.accountNumber}) }
        
@@ -110,11 +120,9 @@ export const transferControllers = async (req, res) => {
            
            await depositUpdate({balance:receiverbalance} , {accountNumber:receiver.accountNumber}, {transaction:t})
            
-           const Transfer= await createTransact(value, {transaction: t})
+           let Transfer= await createTransact(value, {transaction: t})
 
            await t.commit();
-
-           
 return res.status(201).json({message:`Successful transaction`, Transfer})
     }
      catch (error) {
@@ -132,30 +140,30 @@ return res.status(201).json({message:`Successful transaction`, Transfer})
 
 // }
 
-export const alertControllers= async (req, res)=>{
-try {
+// export const alertControllers= async (req, res)=>{
+// try {
     
-    const loggedIn = req.user
+//     const loggedIn = req.user
 
-if (!loggedIn)return res.status(404).json({error:`You must be logged in to check alerts`})
+// if (!loggedIn)return res.status(404).json({error:`You must be logged in to check alerts`})
 
-const {accountNumber, category, destinationAccount}= req.body
+// const {accountNumber, category, destinationAccount}= req.body
 
-const findAccount=  await findAccountNumber({accountNumber})
+// const findAccount=  await findAccountNumber({accountNumber})
 
-if(!findAccount)return res.status(404).json({error:`This account does no exists`})
+// if(!findAccount)return res.status(404).json({error:`This account does no exists`})
          
-category= "deposit"
+// category= "deposit"
 
-destinationAccount= findAccount.id
+// destinationAccount= findAccount.id
 
-const findAlert = await findAlert({destinationAccount, category})
+// const findAlert = await findAlert({destinationAccount, category})
 
-return res.status(201).json({message:`Successful`, findAlert})
+// return res.status(201).json({message:`Successful`, findAlert})
 
-} catch (error) {
-    console.error(`Error finding transaction ${error.message}`);
+// } catch (error) {
+//     console.error(`Error finding transaction ${error.message}`);
     
-    return(`Internal Server Error`)
-}
-}
+//     return(`Internal Server Error`)
+// }
+// }

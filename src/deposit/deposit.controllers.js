@@ -2,7 +2,7 @@ import { bankAccount } from "../models/bankaccount.js";
 import { findAccount } from "../users/users.services.js";
 import { depositReg } from "../validators/deposit.js";
 import {  createTransact, depositUpdate } from "./deposit.services.js";
-import { comparePassword } from "../../utils/bcrypt.js";
+import { comparePassword } from "../utils/bcrypt.js";
 
  export const depositController = async(req, res) => {
 try {

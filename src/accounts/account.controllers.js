@@ -1,6 +1,6 @@
 import { where } from "sequelize";
-import { generatUniqueNumber } from "../../utils/accountNumber.js";
-import { comparePassword, hashPassword } from "../../utils/bcrypt.js";
+import { generatUniqueNumber } from '../utils/accountNumber.js';
+import { comparePassword, hashPassword } from '../utils/bcrypt.js'
 import { depositUpdate } from "../deposit/deposit.services.js";
 import { bankAccount } from "../models/bankaccount.js";
 import { findAccount, findAl, findUserByEmail } from "../users/users.services.js";
@@ -17,19 +17,26 @@ try {
 
     if(!loggedIn) return res.status(404).json({error: `You have not logged in yet`})
 
-const{error, value}= accountReg.validate(req.body)
+    const{error, value}= accountReg.validate(req.body)
 
     if (error) return res.status(404).json({error: error.message})
 
     let{accountType, currency, accountNumber, userID, pin}= value;
 
+    
     if(!["USD", "NGN", "EUR"].includes(currency)) return res.status(400).json({error:`Currency must be NGN, USD or EUR`})
-
+       
+        // currency= currency.toUpperCase()
+        
  value.userID= loggedIn.id
 
  value.accountNumber= await generatUniqueNumber(10, bankAccount)
 
+
+
+
  value.pin= await hashPassword(pin)
+
 
 let Account= await createAccount(value)
 
@@ -103,21 +110,21 @@ const{error, value}= pinReg.validate(req.body)
         
    const findEmail = await findUserByEmail({email})  
         
-   if(!findEmail)return res.status(404).json({error:`Email doesnot exits`})
+   if(!findEmail)return res.status(404).json({error:`Email does not exits`})
     
-    email  = req.email;
+    // email  = req.email;
 
     // email= loggedemail
     
    
     
-   let  loggedOTP = req.OTP
+//    let  loggedOTP = req.OTP
 
-   OTP = loggedOTP
+//    OTP = loggedOTP
 
-      if(!OTP)return res.status(404).json({error:`Pls checkyour email for the OTP`})  
+//       if(!OTP)return res.status(404).json({error:`Pls checkyour email for the OTP`})  
 
-        if(OTP != req.tp)return req.status(404).json({error:`Incorrect OTP`})
+//         if(OTP != req.tp)return req.status(404).json({error:`Incorrect OTP`})
         
 
     const update= await depositUpdate({pin:Pin}, {accountNumber})

@@ -8,7 +8,7 @@ import { decode } from 'jsonwebtoken';
 import { sequelize } from './config/sequelize.js';
 import { initDB } from './models/index.js';
 import jwt from 'jsonwebtoken'
-import { routes } from '../utils/routes.js';
+import { routes } from './utils/routes.js';
 import { aToken } from './tokens/jwt.js';
 import { rToken } from './tokens/jwt.js';
 
