@@ -33,7 +33,7 @@ export const registerUserController= async (req, res)=>{
          if(error) {return res.status(404).json({error:error.message})}
         
         //  destructure the data from frontend
-        let{ firstName, lastName, email, password, accountType, role, pin}=value
+        let{ firstName, lastName, email, password, accountType, pin}=value
 let exist=true
         // check if email exists
         //   const emailExist=users.find((user)=>user.email === email)
