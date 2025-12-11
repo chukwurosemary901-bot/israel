@@ -5,3 +5,4 @@ export const transferRoute= Router();
 
 transferRoute.post('/', auth, transferController.transferControllers )
 // transferRoute.get('/', auth, transferController.alertControllers )
+transferRoute.get('/records/:id', auth, transferController.viewTransactionControllers)

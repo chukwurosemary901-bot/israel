@@ -1,4 +1,4 @@
-import { createTransact, depositUpdate, findAlert } from "../transfer/transfer.services.js"
+import { createTransact, depositUpdate, findAlert, viewTransact } from "../transfer/transfer.services.js"
 import { findAccount } from "../transfer/transfer.services.js"
 import { transferSchema } from "../validators/transfer.js"
 import { sequelize } from "../config/sequelize.js"
@@ -167,3 +167,40 @@ return res.status(201).json({message:`Successful transaction`, Transfer})
 //     return(`Internal Server Error`)
 // }
 // }
+
+
+export const viewTransactionControllers = async (req, res) => {
+    
+
+try {
+    
+    const loggedIn = req.user;
+            
+    if (!loggedIn){
+
+ return res.status(404).json({error:`Kindly login to access this endpoint`})}
+          
+ const accountID= req.params.id
+ 
+console.log(accountID);
+
+//     if (loggedIn.id != sender.userID ){
+
+
+//    return res.status(401).json({error:`No be you get this  account`})
+//         }
+
+       const transact =  await viewTransact(accountID)
+
+       if(!transact)return res.status(404).json({message:`No transact`})
+        
+       return res.status(200).json({transact})
+    }
+        catch (error) {
+        console.error(`Error findind transfer recodrs:${error.message}`)
+
+        return(`Internal Server Error`)
+}
+        
+}
+
