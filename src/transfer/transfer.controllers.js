@@ -1,4 +1,4 @@
-import { createTransact, depositUpdate, findAlert } from "../transfer/transfer.services.js"
+import { createTransact, depositUpdate, findAlert, viewTransact } from "../transfer/transfer.services.js"
 import { findAccount } from "../transfer/transfer.services.js"
 import { transferSchema } from "../validators/transfer.js"
 import { sequelize } from "../config/sequelize.js"
@@ -167,3 +167,51 @@ return res.status(201).json({message:`Successful transaction`, Transfer})
 //     return(`Internal Server Error`)
 // }
 // }
+
+
+export const viewTransactionControllers = async (req, res) => {
+    
+try {
+    
+const loggedIn = req.user;
+            
+if (!loggedIn){
+
+return res.status(404).json({error:`Kindly login to access this endpoint`})}
+          
+ const accountID= req.params.id
+
+ if (!accountID)return res.status(401).json({error:`Account is required `})
+ 
+const findAccount= await findAccountNumber({id:accountID})
+
+if(!findAccount)return res.status(404).json({error:`acount not found with id ${accountID}`})
+
+
+    if (loggedIn.id !== findAccount.userID )return res.status(404).json({error:`You are not authorized to perfom this transaction`})
+
+
+
+   
+   const transact =  await viewTransact(accountID)
+  
+    if(transact.length===0 )return res.status(404).json({message:`No transaction found`})
+
+   return res.status(200).json({transact})
+       
+
+
+}
+
+
+     
+        
+        catch (error) {
+            console.error(`Error finding transfer records:${error.message}`)
+            
+            return(`Internal Server Error`)
+        }
+        
+    }
+
+
