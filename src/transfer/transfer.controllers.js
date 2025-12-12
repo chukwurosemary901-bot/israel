@@ -171,36 +171,47 @@ return res.status(201).json({message:`Successful transaction`, Transfer})
 
 export const viewTransactionControllers = async (req, res) => {
     
-
 try {
     
-    const loggedIn = req.user;
+const loggedIn = req.user;
             
-    if (!loggedIn){
+if (!loggedIn){
 
- return res.status(404).json({error:`Kindly login to access this endpoint`})}
+return res.status(404).json({error:`Kindly login to access this endpoint`})}
           
  const accountID= req.params.id
+
+ if (!accountID)return res.status(401).json({error:`Account is required `})
  
-console.log(accountID);
+const findAccount= await findAccountNumber({id:accountID})
 
-//     if (loggedIn.id != sender.userID ){
+if(!findAccount)return res.status(404).json({error:`acount not found with id ${accountID}`})
 
 
-//    return res.status(401).json({error:`No be you get this  account`})
-//         }
+    if (loggedIn.id !== findAccount.userID )return res.status(404).json({error:`You are not authorized to perfom this transaction`})
 
-       const transact =  await viewTransact(accountID)
 
-       if(!transact)return res.status(404).json({message:`No transact`})
+
+   
+   const transact =  await viewTransact(accountID)
+  
+    if(transact.length===0 )return res.status(404).json({message:`No transaction found`})
+
+   return res.status(200).json({transact})
+       
+
+
+}
+
+
+     
         
-       return res.status(200).json({transact})
-    }
         catch (error) {
-        console.error(`Error findind transfer recodrs:${error.message}`)
-
-        return(`Internal Server Error`)
-}
+            console.error(`Error finding transfer records:${error.message}`)
+            
+            return(`Internal Server Error`)
+        }
         
-}
+    }
+
 
